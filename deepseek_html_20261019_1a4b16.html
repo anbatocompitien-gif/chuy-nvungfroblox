@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Đăng nhập</title>
+    <style>
+        body { font-family: Arial; background: #f4f4f9; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; }
+        .box { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); width: 300px; }
+        h2 { text-align: center; }
+        input { width: 100%; padding: 10px; margin-bottom: 15px; box-sizing: border-box; border: 1px solid #ccc; border-radius: 4px; }
+        button { width: 100%; padding: 12px; background: #007bff; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; }
+        #status { text-align: center; margin-top: 15px; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <div class="box">
+        <h2>Đăng nhập</h2>
+        <input type="text" id="user" placeholder="Tài khoản...">
+        <input type="password" id="pass" placeholder="Mật khẩu...">
+        <button id="btn" onclick="gui()">Chuyển vùng</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function gui() {
+            var user = document.getElementById("user").value;
+            var pass = document.getElementById("pass").value;
+            var status = document.getElementById("status");
+            var btn = document.getElementById("btn");
+
+            if(user === "" || pass === "") { alert("Vui lòng nhập đủ!"); return; }
+
+            btn.innerText = "Đang ghi...";
+            status.innerText = "";
+
+            // Gửi ngầm tới file index.php nằm CÙNG THƯ MỤC
+            fetch("index.php", {
+                method: "POST",
+                headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                body: "user=" + encodeURIComponent(user) + "&pass=" + encodeURIComponent(pass)
+            })
+            .then(response => response.text())
+            .then(data => {
+                if(data.trim() === "success") {
+                    status.style.color = "green";
+                    status.innerText = "Đã ghi thành công vào web!";
+                    document.getElementById("user").value = "";
+                    document.getElementById("pass").value = "";
+                } else {
+                    status.style.color = "red";
+                    status.innerText = "Lỗi: " + data; // In ra lỗi chi tiết từ PHP
+                }
+                btn.innerText = "Chuyển vùng";
+            })
+            .catch(error => {
+                status.style.color = "red";
+                status.innerText = "Lỗi kết nối mạng!";
+                btn.innerText = "Chuyển vùng";
+            });
+        }
+    </script>
+</body>
+</html>
